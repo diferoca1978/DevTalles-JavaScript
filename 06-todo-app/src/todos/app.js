@@ -1,36 +1,101 @@
-import html from './app.html?raw'; /* The line importing the contents of the `app.html` file as a string. The `?raw` part of the import statement is used to indicate that the file should be imported as a raw string, rather than as a module. This allows the JavaScript code to access the contents of
-the HTML file and use it in the application. */
+import html from './app.html?raw';
+import todoStore, { Filters } from '../store/todo.store';
+import { renderTodos, renderPending } from './use-cases';
 
 
-import todoStrore from '../store/todo-strore';
-import { renderTodos } from './uses-cases';
-
-const elementsID = {
-    Todolist: '.todo-list'
+const ElementIDs = {
+    ClearCompletedButton: '.clear-completed',
+    TodoList: '.todo-list',
+    NewTodoInput: '#new-todo-input',
+    TodoFilters: '.filtro',
+    PendingCountLabel: '#pending-count',
 }
 
 /**
- * The `displayTodos` function retrieves todos from the todoStore and renders them.
- * @param elementId - The `elementId` parameter is the ID of the HTML element where the todos will be
- * displayed.
+ * 
+ * @param {String} elementId 
  */
 export const App = ( elementId ) => {
 
     const displayTodos = () => {
-
-        const todos = todoStrore.getTodos( todoStrore.getCurrentFilter());
-        renderTodos( elementsID.Todolist, todos);
-
+        const todos = todoStore.getTodos( todoStore.getCurrentFilter() );
+        renderTodos( ElementIDs.TodoList, todos );
+        updatePendingCount();
     }
 
+    const updatePendingCount = () => {
+        renderPending(ElementIDs.PendingCountLabel);
+    }
 
-    (()=>{
-
+    // Cuando la función App() se llama
+    (()=> {
         const app = document.createElement('div');
         app.innerHTML = html;
-        document.querySelector( elementId ).append( app );
+        document.querySelector(elementId).append( app );
         displayTodos();
+    })();
 
-    })()
- 
+
+    // Referencias HTML
+    const newDescriptionInput = document.querySelector( ElementIDs.NewTodoInput );
+    const todoListUL = document.querySelector( ElementIDs.TodoList );
+    const clearCompletedButton = document.querySelector( ElementIDs.ClearCompletedButton );
+    const filtersLIs = document.querySelectorAll( ElementIDs.TodoFilters );
+
+    // Listeners
+    newDescriptionInput.addEventListener('keyup', ( event ) => {
+        if ( event.keyCode !== 13 ) return;
+        if ( event.target.value.trim().length === 0 ) return;
+
+        todoStore.addTodo( event.target.value );
+        displayTodos();
+        event.target.value = '';
+    });
+
+    todoListUL.addEventListener('click', (event) => {
+        const element = event.target.closest('[data-id]');
+        todoStore.toggleTodo( element.getAttribute('data-id') );
+        displayTodos();
+    });
+
+    todoListUL.addEventListener('click', (event) => {
+        const isDestroyElement = event.target.className === 'destroy';
+        const element = event.target.closest('[data-id]');
+        if ( !element || !isDestroyElement ) return;
+
+        todoStore.deleteTodo( element.getAttribute('data-id') );
+        displayTodos();
+    });
+
+    clearCompletedButton.addEventListener( 'click', () => {
+        todoStore.deleteCompleted();
+        displayTodos();
+    });
+
+    filtersLIs.forEach( element => {
+
+        element.addEventListener('click', (element) => {
+            filtersLIs.forEach( el => el.classList.remove('selected') );
+            element.target.classList.add('selected');
+
+            switch( element.target.text ){
+                case 'Todos':
+                    todoStore.setFilter( Filters.All )
+                break;
+                case 'Pendientes':
+                    todoStore.setFilter( Filters.Pending )
+                break;
+                case 'Completados':
+                    todoStore.setFilter( Filters.Completed )
+                break;
+            }
+
+            displayTodos();
+
+        });
+
+
+    });
+
+
 }
