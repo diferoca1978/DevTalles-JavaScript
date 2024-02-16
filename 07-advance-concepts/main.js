@@ -2,6 +2,7 @@ import './style.css'
 import javascriptLogo from './javascript.svg'
 import viteLogo from '/vite.svg'
 import { callbackComponent } from './src/concepts/02-callbacks.js';
+import { promisesComponent } from './src/concepts/03-promises.js';
 
 
 document.querySelector('#app').innerHTML = `
@@ -22,5 +23,6 @@ document.querySelector('#app').innerHTML = `
 
 const element = document.querySelector('.card');
 
-callbackComponent( element );
+// callbackComponent( element );
+promisesComponent (element)
 
