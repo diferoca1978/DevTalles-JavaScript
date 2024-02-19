@@ -6,10 +6,11 @@ import { heroes } from "../data/heroes"
  */
 export const asyncComponent = ( element ) => {
 
-  const id1 = '5d86371f9f80b591f499df32'
+  const id1 = '5d86371f9f80b591f499df3'
 
   findHero(id1)
       .then(({name}) => element.innerHTML = name )
+      .catch( error => element.innerHTML = `<h1>${error}</h1>`)
     
 }
  
@@ -23,6 +24,7 @@ export const asyncComponent = ( element ) => {
 const findHero = async(id) => {
 
   const hero = heroes.find(hero => hero.id === id);
+   if ( !hero ) throw new Error(`Hero with id: ${id} not found`)
 
   return hero;
    
