@@ -36,7 +36,7 @@ export const callbackComponent = ( element ) => {
 const findHero = (id, callback) => {
 
   const hero = heroes.find( hero => hero.id === id);
-  if (!hero) {
+    if (!hero) {
     callback( `Hero with id: ${ id } Not found `);
     return;
   };

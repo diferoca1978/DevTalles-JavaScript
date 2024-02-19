@@ -3,6 +3,8 @@ import javascriptLogo from './javascript.svg'
 import viteLogo from '/vite.svg'
 import { callbackComponent } from './src/concepts/02-callbacks.js';
 import { promisesComponent } from './src/concepts/03-promises.js';
+import { raceComponet } from './src/concepts/04-promise-race-component.js';
+import { asyncComponent } from './src/concepts/05-async.js';
 
 
 document.querySelector('#app').innerHTML = `
@@ -24,5 +26,8 @@ document.querySelector('#app').innerHTML = `
 const element = document.querySelector('.card');
 
 // callbackComponent( element );
-promisesComponent (element)
+// promisesComponent (element);
+// raceComponet(element);
+asyncComponent(element);
+
 
