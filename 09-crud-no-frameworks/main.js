@@ -1,5 +1,6 @@
 import './style.css'
 import javascriptLogo from './javascript.svg'
+import { usersApp } from './src/users/user-app';
 
 
 
@@ -17,3 +18,5 @@ document.querySelector('#app').innerHTML = `
 `
 
 const element = document.querySelector('.card');
+
+usersApp(element);
