@@ -22,5 +22,5 @@ document.querySelector('#app').innerHTML = `
 `
 const element = document.querySelector('.card');
 
-//structuredCloneMethod(element)
-arrayWithmethod(element)
+//structuredCloneMethod(element);
+arrayWithmethod(element);
