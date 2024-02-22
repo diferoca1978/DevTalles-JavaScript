@@ -1,0 +1,16 @@
+button {
+  background-color: rgba(0, 0, 0, 348);
+  border-radius: 8px;
+  border-top: 3px;
+  border-color:blue;
+  margin: 10px;
+}
+
+#current-page {
+  font-size: 1.3rem;
+  margin: 0 10px;
+  color:antiquewhite;
+  padding: 5px;
+  border-radius: 8px;
+  background-color: blueviolet;
+}
