@@ -1,84 +1,94 @@
-import modalhtml from "./render-modal.html?raw";
-import './render-modal.css'
+import modalHtml from './render-modal.html?raw';
+import { User } from '../../models/user';
+import { getUserById } from '../../use-cases/get-user-by-id';
 
+import './render-modal.css';
 
-let modal,
-    form
+let modal, form;
+let loadedUser = {};
 
-// Show modal.
+/**
+ * 
+ * @param {String|Number} id 
+ */
+export const showModal = async( id ) => {
+    modal?.classList.remove('hide-modal');
+    loadedUser = {};
 
-export const showModal = () => {
-
-  if (modal) {
-    modal.classList.remove('hide-modal')
-  }
-
+    if ( !id ) return;
+    const user = await getUserById( id );
+    setFormValues(user);
 }
 
-// Hide modal.
 export const hideModal = () => {
-
-  if (modal) {
-    modal.classList.add('hide-modal');
-
-    form?.reset(); // This is another way to ask if something exists.
-  }
-
+    modal?.classList.add('hide-modal');
+    form?.reset();
 }
+
+
+/**
+ * 
+ * @param {User} user 
+ */
+const setFormValues = ( user ) => {
+    form.querySelector('[name="firstName"]').value = user.firstName;
+    form.querySelector('[name="lastName"]').value = user.lastName;
+    form.querySelector('[name="balance"]').value = user.balance;
+    form.querySelector('[name="isActive"]').checked = user.isActive;
+    loadedUser = user;
+}
+
+
 
 /**
  * 
  * @param {HTMLDivElement} element 
+ * @param {(userLike)=> Promise<void> } callback
  */
-export const renderModal = ( element ) => {
-   
-  if ( modal ) return;
+export const renderModal = ( element, callback ) => {
 
-  modal = document.createElement('div');
-  modal.innerHTML = modalhtml;
-  modal.classList.add('modal-container', 'hide-modal');
-  form = modal.querySelector('form');
+    if ( modal ) return;
+
+    modal = document.createElement('div');
+    modal.innerHTML = modalHtml;
+    modal.className = 'modal-container hide-modal';
+    form = modal.querySelector('form');
 
 
-  modal.addEventListener('click', (event) => {
-    
-    if (event.target.className === 'modal-container') {
-      hideModal();
-    }
 
-  })
+    modal.addEventListener('click', (event) => {
+        if ( event.target.className === 'modal-container' ) {
+            hideModal();
+        }
+    });
 
-  form.addEventListener('submit', (event) => {
+    form.addEventListener('submit', async(event) => {
+        event.preventDefault();
+        
+        const formData = new FormData( form );
+        const userLike = { ...loadedUser };
 
-    event.preventDefault();
+        for (const [key, value] of formData) {
+            if ( key === 'balance' ){
+                userLike[key] =  +value;
+                continue;
+            }
 
-    // To catch the data from the form (pure vanilla JS).
-
-    const formData = new FormData( form );
-
-    const userLike = {};
-
-    for (const [key, value] of formData) {
-        if (key === 'balance') {
-          userLike[key] = +value;
-          continue;
+            if ( key === 'isActive' ) {
+                userLike[key] = (value === 'on') ? true : false;
+                continue;
+            }
+            
+            userLike[key] = value;
         }
 
-        if (key === 'isActive') {
-          userLike[key] = (value !== 'on') ? false : true;
-          continue;
-        }
+        // console.log(userLike);
+        await callback( userLike );
 
-        userLike[key] = value;
+        hideModal();        
+    });
 
-    }
 
-    console.log(userLike);
-
-    hideModal();
-
-  })
-
-  element.append( modal );
+    element.append( modal );
 
 }

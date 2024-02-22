@@ -1,37 +1,37 @@
-import usersStore from "../../store/users-store";
-import { renderTable } from "../render-table/render-table";
+import usersStore from '../../store/users-store';
+import { renderTable } from '../render-table/render-table';
 import './render-buttons.css';
 
 /**
  * 
  * @param {HTMLDivElement} element 
  */
-export const renderButons = ( element ) => {
-  
-  const nextButton = document.createElement('button');
-  nextButton.innerText = 'Next >';
+export const renderButtons = ( element ) => {
 
-  const prevButton = document.createElement('button');
-  prevButton.innerText = '< Prev';
+    const nextButton = document.createElement('button');
+    nextButton.innerText = ' Next >';
+    
+    const prevButton = document.createElement('button');
+    prevButton.innerText = '< Prev ';
 
-  const currentPage = document.createElement('span');
-  currentPage.id = 'current-page';
-  currentPage.innerText = usersStore.getCurrentPage(); 
+    const currentPageLabel = document.createElement('span');
+    currentPageLabel.id = 'current-page'
+    currentPageLabel.innerText = usersStore.getCurrentPage();
 
-  element.append(prevButton, currentPage, nextButton);
+    element.append( prevButton, currentPageLabel, nextButton );
 
-  // Adding listeners to add functionality to the buttons.
 
-  nextButton.addEventListener('click', async() => {
-    await usersStore.loadNextPage();
-    currentPage.innerText = usersStore.getCurrentPage();
-    renderTable( element );
-  });
+    nextButton.addEventListener('click', async() => {
+        await usersStore.loadNextPage();
+        currentPageLabel.innerText = usersStore.getCurrentPage();
+        renderTable( element );
+    });
 
-  prevButton.addEventListener('click',async() => {
-    await usersStore.loadPrevPage();
-    currentPage.innerText = usersStore.getCurrentPage()
-    renderTable( element )
-  })
+    prevButton.addEventListener('click', async() => {
+        await usersStore.loadPreviousPage();
+        currentPageLabel.innerText = usersStore.getCurrentPage();
+        renderTable( element );
+    });
 
 }
+

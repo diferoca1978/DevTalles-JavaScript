@@ -1,57 +1,73 @@
-import { loadUsersByPage } from "../use-cases/load-users";
+import { loadUsersByPage } from "../use-cases/load-users-by-page";
 
 
-  const state = {
-
+const state = {
     currentPage: 0,
     users: [],
-  }
+}
 
+const loadNextPage = async() => {
+    const users = await loadUsersByPage( state.currentPage + 1 );
+    if ( users.length === 0 ) return;
 
-  const loadNextPage = async() => {
-     const users = await loadUsersByPage( state.currentPage + 1 ); // Here we have the users.
-     if (users.length === 0) return; // Then we ask if the users array is empty not do anything.
+    state.currentPage += 1;
+    state.users = users;
+}
 
-     // Finally we update the state like this:
-     state.currentPage += 1; 
-     state.users = users;
-  }
-
-
-  const loadPrevPage = async() => {
-    if (state.currentPage === 1) return;
-    const users = await loadUsersByPage( state.currentPage - 1);
-
+const loadPreviousPage = async() => {
+    if ( state.currentPage === 1 ) return;
+    const users = await loadUsersByPage( state.currentPage - 1 );
+    
     state.users = users;
     state.currentPage -= 1;
+}
+
+/**
+ * 
+ * @param {User} updatedUser 
+ */
+const onUserChanged = (updatedUser) => {
+
+    let wasFound = false;
+
+    state.users = state.users.map( user => {
+        if ( user.id === updatedUser.id ) {
+            wasFound = true;
+            return updatedUser;
+        }
+        return user;
+    });
+
+    if ( state.users.length < 10 && !wasFound ) {
+        state.users.push( updatedUser );
+    }
+
+}
+
+const reloadPage = async() => {
+    const users = await loadUsersByPage( state.currentPage );
+    if ( users.length === 0 ) {
+        await loadPreviousPage();
+        return;
+    } 
     
-  }
-
-  
-  const onUserChanged = () => {
-    throw new Error('Method not implemented');
-  }
-
-  const ReloadPage = () => {
-    throw new Error('Method not implemented'); 
-  }
+    state.users = users;
+}
 
 
-  export default {
+export default {
     loadNextPage,
-    loadPrevPage,
+    loadPreviousPage,
     onUserChanged,
-    ReloadPage,
-
+    reloadPage,
 
     /**
-     * 
-     * @returns {Users[]}
+     * @returns {User[]}
      */
-     getUsers: () => [...state.users], // Here we're doing that the state object can be accessed from out, so it is passed as a reference.
-     /**
-      * 
-      * @returns {Number}
-      */
-     getCurrentPage: () => state.currentPage, // Here we're accessing to the value current page, but it doesn't pass as a reference because his value is a primitive value.
-  }
+    getUsers: () => [...state.users],
+
+    /**
+     * @returns {Number}
+     */
+    getCurrentPage: () => state.currentPage,
+}
